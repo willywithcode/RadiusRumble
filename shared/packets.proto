@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package packets;
+
+option go_package = "pkg/packets";
+
+message Packet {
+    uint64 sender_id = 1;
+}
+
