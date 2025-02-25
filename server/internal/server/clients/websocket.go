@@ -32,7 +32,7 @@ func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *ht
 		return nil, err
 	}
 	var c = &WebSocketClient{
-		id:       uint64(len(hub.Clients)),
+		id:       uint64(hub.Clients.Len()),
 		conn:     conn,
 		hub:      hub,
 		logger:   log.Default(),
@@ -47,11 +47,18 @@ func (c *WebSocketClient) Id() uint64 {
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, msg packets.Msg) {
+	if senderId == c.id {
+		c.Broadcast(msg)
+		return
+	}
+	c.SocketSendAs(senderId, msg)
 }
 
 func (c *WebSocketClient) Initialize(id uint64) {
 	c.id = id
 	c.logger.SetPrefix(fmt.Sprintf("Client %d: ", c.id))
+	c.SocketSend(packets.NewId(c.id))
+	c.logger.Printf("Sent id packet to client %d", c.id)
 }
 
 func (c *WebSocketClient) SocketSend(msg packets.Msg) {
@@ -67,7 +74,7 @@ func (c *WebSocketClient) SocketSendAs(senderId uint64, msg packets.Msg) {
 }
 
 func (c *WebSocketClient) PassToPeer(msg packets.Msg, peerId uint64) {
-	if peer, exists := c.hub.Clients[peerId]; exists {
+	if peer, exists := c.hub.Clients.Get(peerId); exists {
 		peer.ProcessMessage(c.id, msg)
 		return
 	}

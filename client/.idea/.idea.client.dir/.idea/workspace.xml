@@ -1,15 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7c7bf176-829a-4efc-8217-cdb075261958" name="Changes" comment="" />
+    <list default="true" id="7c7bf176-829a-4efc-8217-cdb075261958" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.client.dir/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.client.dir/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.gd" beforeDir="false" afterPath="$PROJECT_DIR$/main.gd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.tscn" beforeDir="false" afterPath="$PROJECT_DIR$/main.tscn" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/project.godot" beforeDir="false" afterPath="$PROJECT_DIR$/project.godot" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/internal/server/clients/websocket.go" beforeDir="false" afterPath="$PROJECT_DIR$/../server/internal/server/clients/websocket.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../server/internal/server/hub.go" beforeDir="false" afterPath="$PROJECT_DIR$/../server/internal/server/hub.go" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 6
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "willywithcode"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:willywithcode/RadiusRumble.git",
+    "accountId": "942d2f6f-7473-4dce-89ef-2a77d5125065"
+  }
+}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2tRROvObPHwpBplfQZoBgR7Q7ON" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
@@ -21,10 +43,45 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "main",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "preferences.pluginManager"
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "rider.external.source.directories": [
+      "C:\\Users\\TCT\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\DecompilerCache",
+      "C:\\Users\\TCT\\AppData\\Roaming\\JetBrains\\Rider2024.1\\resharper-host\\SourcesCache",
+      "C:\\Users\\TCT\\AppData\\Local\\Symbols\\src"
+    ]
   }
 }]]></component>
+  <component name="RunManager" selected="Native Executable.Player">
+    <configuration name="Editor" type="RunNativeExe" factoryName="Native Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../../SteamLibrary/steamapps/common/Godot Engine/godot.windows.opt.tools.64.exe" />
+      <option name="PROGRAM_PARAMETERS" value="--path &quot;./&quot; --editor" />
+      <option name="WORKING_DIRECTORY" value="D:\SE\RadiusRumble\client" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Player" type="RunNativeExe" factoryName="Native Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../../SteamLibrary/steamapps/common/Godot Engine/godot.windows.opt.tools.64.exe" />
+      <option name="PROGRAM_PARAMETERS" value="--path &quot;./&quot;" />
+      <option name="WORKING_DIRECTORY" value="D:\SE\RadiusRumble\client" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration default="true" type="RunNativeExe" factoryName="Native Executable">
+      <option name="EXE_PATH" value="" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <method v="2" />
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -34,9 +91,17 @@
       <option name="presentableId" value="Default" />
       <updated>1740312872834</updated>
       <workItem from="1740312877881" duration="3000" />
+      <workItem from="1740461065879" duration="2000" />
+      <workItem from="1740461173439" duration="17000" />
+      <workItem from="1740461896507" duration="5000" />
+      <workItem from="1740463555938" duration="21000" />
     </task>
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
