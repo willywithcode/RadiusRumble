@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://bllk8obj3b060"]
+
+[ext_resource type="Script" path="res://states/ingame/ingame.gd" id="1_wsgfp"]
+[ext_resource type="Script" path="res://classes/log/log.gd" id="2_0u4ox"]
+
+[node name="Ingame" type="Node"]
+script = ExtResource("1_wsgfp")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="Log" type="RichTextLabel" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_0u4ox")
+
+[node name="LineEdit" type="LineEdit" parent="UI"]
+offset_left = 74.0
+offset_top = 512.0
+offset_right = 1053.0
+offset_bottom = 612.0

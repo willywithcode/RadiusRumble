@@ -64,6 +64,8 @@ func (c *WebSocketClient) Initialize(id uint64) {
 func (c *WebSocketClient) SocketSend(msg packets.Msg) {
 	c.SocketSendAs(c.id, msg)
 }
+func (c *WebSocketClient) SetState(state server.ClientStateHandler) {
+}
 
 func (c *WebSocketClient) SocketSendAs(senderId uint64, msg packets.Msg) {
 	select {

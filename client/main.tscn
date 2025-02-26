@@ -1,7 +1,6 @@
-[gd_scene load_steps=3 format=3 uid="uid://baq87iq6pn5pp"]
+[gd_scene load_steps=2 format=3 uid="uid://baq87iq6pn5pp"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_nctnb"]
-[ext_resource type="PackedScene" uid="uid://d3e7s45alyhbg" path="res://classes/log/log.tscn" id="2_vs6jn"]
 
 [node name="Main" type="Control"]
 layout_mode = 3
@@ -13,13 +12,3 @@ grow_vertical = 2
 size_flags_horizontal = 2
 size_flags_vertical = 3
 script = ExtResource("1_nctnb")
-
-[node name="Log" parent="." instance=ExtResource("2_vs6jn")]
-layout_mode = 1
-
-[node name="LineEdit" type="LineEdit" parent="."]
-layout_mode = 0
-offset_left = 5.0
-offset_top = 578.0
-offset_right = 1156.0
-offset_bottom = 633.0

@@ -10,6 +10,7 @@ import (
 type ClientInterface interface {
 	Id() uint64
 	ProcessMessage(senderId uint64, msg packets.Msg)
+	SetState(state ClientStateHandler)
 	Initialize(id uint64)
 	SocketSend(msg packets.Msg)
 	SocketSendAs(senderId uint64, msg packets.Msg)
@@ -18,6 +19,13 @@ type ClientInterface interface {
 	ReadPump()
 	WritePump()
 	Close(reason string)
+}
+
+type ClientStateHandler interface {
+	Name() string
+	SetClient(client ClientInterface)
+	HandleMessage(senderId uint64, msg packets.Msg)
+	OnExit()
 }
 
 type Hub struct {
