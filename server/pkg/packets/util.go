@@ -17,3 +17,16 @@ func NewId(id uint64) Msg {
 		},
 	}
 }
+func NewDenyResponse(reason string) Msg {
+	return &Packet_DenyResponse{
+		DenyResponse: &DenyResponseMessage{
+			Reason: reason,
+		},
+	}
+}
+
+func NewOkResponse() Msg {
+	return &Packet_OkResponse{
+		OkResponse: &OkResponseMessage{},
+	}
+}

@@ -2,12 +2,14 @@ extends Node
 enum GameState {
 	ENTERED,
 	INGAME,
+	CONNECTED,
 }
 
 
 var _state_scene: Dictionary = {
 	GameState.ENTERED: "res://states/entered/entered.tscn",
 	GameState.INGAME: "res://states/ingame/ingame.tscn",
+	GameState.CONNECTED: "res://states/connected/connected.tscn",
 }
 
 

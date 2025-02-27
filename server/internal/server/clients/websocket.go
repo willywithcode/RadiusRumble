@@ -1,10 +1,10 @@
 package clients
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"server/internal/server"
+	"server/internal/server/states"
 	"server/pkg/packets"
 
 	"github.com/gorilla/websocket"
@@ -17,27 +17,36 @@ type WebSocketClient struct {
 	hub      *server.Hub
 	logger   *log.Logger
 	sendChan chan *packets.Packet
+	dbTx     *server.DbTx
+	state    server.ClientStateHandler
 }
 
 func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *http.Request) (server.ClientInterface, error) {
+	log.Println("Creating new WebSocket client...")
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
 		CheckOrigin: func(r *http.Request) bool {
-			return true // Allow all origins for now
+			return true
 		},
 	}
+
 	conn, err := upgrader.Upgrade(writer, request, nil)
 	if err != nil {
+		log.Printf("Failed to upgrade connection: %v", err)
 		return nil, err
 	}
+	log.Println("WebSocket connection upgraded successfully")
+
 	var c = &WebSocketClient{
 		id:       uint64(hub.Clients.Len()),
 		conn:     conn,
 		hub:      hub,
 		logger:   log.Default(),
-		sendChan: make(chan *packets.Packet),
+		sendChan: make(chan *packets.Packet, 256),
+		dbTx:     hub.NewDbTx(),
 	}
+	log.Printf("Created new WebSocket client with temporary ID: %d", c.id)
 	return c, nil
 }
 
@@ -47,24 +56,41 @@ func (c *WebSocketClient) Id() uint64 {
 }
 
 func (c *WebSocketClient) ProcessMessage(senderId uint64, msg packets.Msg) {
-	if senderId == c.id {
-		c.Broadcast(msg)
-		return
-	}
-	c.SocketSendAs(senderId, msg)
+	c.state.HandleMessage(senderId, msg)
 }
 
 func (c *WebSocketClient) Initialize(id uint64) {
-	c.id = id
-	c.logger.SetPrefix(fmt.Sprintf("Client %d: ", c.id))
-	c.SocketSend(packets.NewId(c.id))
-	c.logger.Printf("Sent id packet to client %d", c.id)
+	c.SetState(&states.Connected{})
 }
 
 func (c *WebSocketClient) SocketSend(msg packets.Msg) {
 	c.SocketSendAs(c.id, msg)
 }
+
+func (c *WebSocketClient) DbTx() *server.DbTx {
+	return c.dbTx
+}
+
 func (c *WebSocketClient) SetState(state server.ClientStateHandler) {
+	prevStateName := "None"
+	if c.state != nil {
+		prevStateName = c.state.Name()
+		c.state.OnExit()
+	}
+
+	newStateName := "None"
+	if state != nil {
+		newStateName = state.Name()
+	}
+
+	c.logger.Printf("Switching from state %s to %s", prevStateName, newStateName)
+
+	c.state = state
+
+	if c.state != nil {
+		c.state.SetClient(c)
+		c.state.OnEnter()
+	}
 }
 
 func (c *WebSocketClient) SocketSendAs(senderId uint64, msg packets.Msg) {
@@ -92,6 +118,8 @@ func (c *WebSocketClient) ReadPump() {
 		c.logger.Println("Closing read pump")
 		c.Close("Read pump closed")
 	}()
+
+	c.logger.Println("Starting read pump")
 	for {
 		_, data, err := c.conn.ReadMessage()
 		if err != nil {
@@ -100,6 +128,7 @@ func (c *WebSocketClient) ReadPump() {
 			}
 			break
 		}
+		c.logger.Printf("Received message: %d bytes", len(data))
 		packet := &packets.Packet{}
 		err = proto.Unmarshal(data, packet)
 		if err != nil {
@@ -118,7 +147,10 @@ func (c *WebSocketClient) WritePump() {
 		c.logger.Println("Closing write pump")
 		c.Close("Write pump closed")
 	}()
+
+	c.logger.Println("Starting write pump")
 	for packet := range c.sendChan {
+		c.logger.Printf("Sending packet to client")
 		writer, err := c.conn.NextWriter(websocket.BinaryMessage)
 		if err != nil {
 			c.logger.Printf("error: %v", err)
@@ -145,7 +177,7 @@ func (c *WebSocketClient) WritePump() {
 
 func (c *WebSocketClient) Close(reason string) {
 	c.logger.Printf("Client %d disconnected: %s", c.id, reason)
-
+	c.SetState(nil)
 	c.hub.UnregisterChan <- c
 	c.conn.Close()
 	if _, closed := <-c.sendChan; !closed {
