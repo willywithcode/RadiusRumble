@@ -24,16 +24,18 @@ func NewSharedCollection[T any](capacity ...int) *SharedCollection[T] {
 	}
 }
 
-func (c *SharedCollection[T]) Add(obj T) uint64 {
+func (c *SharedCollection[T]) Add(obj T, id ...uint64) uint64 {
 	c.mapMux.Lock()
 	defer c.mapMux.Unlock()
 
-	id := c.nextId
-	c.objectsMap[id] = obj
+	thisId := c.nextId
+	if len(id) > 0 {
+		thisId = id[0]
+	}
+	c.objectsMap[thisId] = obj
 	c.nextId++
-	return id
+	return thisId
 }
-
 func (c *SharedCollection[T]) Get(id uint64) (T, bool) {
 	c.mapMux.Lock()
 	defer c.mapMux.Unlock()

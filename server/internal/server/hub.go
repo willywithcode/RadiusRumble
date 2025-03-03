@@ -20,6 +20,7 @@ type ClientInterface interface {
 
 	// A reference to the database transaction context
 	DbTx() *DbTx
+	SharedGameObjects() *SharedGameObjects
 
 	Initialize(id uint64)
 	SocketSend(msg packets.Msg)
@@ -40,11 +41,12 @@ type ClientStateHandler interface {
 }
 
 type Hub struct {
-	Clients        *objects.SharedCollection[ClientInterface]
-	BroadcastChan  chan *packets.Packet
-	RegisterChan   chan ClientInterface
-	UnregisterChan chan ClientInterface
-	dbPool         *sql.DB
+	Clients          *objects.SharedCollection[ClientInterface]
+	BroadcastChan    chan *packets.Packet
+	RegisterChan     chan ClientInterface
+	UnregisterChan   chan ClientInterface
+	dbPool           *sql.DB
+	SharedGameObject *SharedGameObjects
 }
 type DbTx struct {
 	Ctx     context.Context
@@ -56,6 +58,10 @@ func (h *Hub) NewDbTx() *DbTx {
 		Ctx:     context.Background(),
 		Queries: db.New(h.dbPool),
 	}
+}
+
+type SharedGameObjects struct {
+	Players *objects.SharedCollection[*objects.Player]
 }
 
 var (
@@ -74,6 +80,9 @@ func NewHub() *Hub {
 		RegisterChan:   make(chan ClientInterface, 256),
 		UnregisterChan: make(chan ClientInterface, 256),
 		dbPool:         dbPool,
+		SharedGameObject: &SharedGameObjects{
+			Players: objects.NewSharedCollection[*objects.Player](),
+		},
 	}
 }
 
@@ -85,13 +94,10 @@ func (h *Hub) Run() {
 	for {
 		select {
 		case client := <-h.RegisterChan:
-			log.Printf("Registering new client with ID %d", h.Clients.Len())
 			client.Initialize(h.Clients.Add(client))
 		case client := <-h.UnregisterChan:
-			log.Printf("Unregistering client %d", client.Id())
 			h.Clients.Remove(client.Id())
 		case packet := <-h.BroadcastChan:
-			log.Printf("Broadcasting message from client %d", packet.SenderId)
 			h.Clients.ForEach(func(id uint64, client ClientInterface) {
 				if id != packet.SenderId {
 					client.ProcessMessage(packet.SenderId, packet.Msg)
@@ -109,11 +115,7 @@ func (h *Hub) Serve(getNewClient func(*Hub, http.ResponseWriter, *http.Request) 
 		return
 	}
 
-	log.Printf("Starting pumps for client %d", client.Id())
 	go client.WritePump()
 	go client.ReadPump()
-
-	log.Printf("Registering client %d", client.Id())
 	h.RegisterChan <- client
-	log.Printf("Client %d registered successfully", client.Id())
 }

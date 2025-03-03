@@ -7,6 +7,7 @@ import (
 	"log"
 	"server/internal/server"
 	"server/internal/server/db"
+	"server/internal/server/objects"
 	"server/pkg/packets"
 	"strings"
 
@@ -45,7 +46,6 @@ func (c *Connected) HandleMessage(senderId uint64, msg packets.Msg) {
 	}
 }
 func (c *Connected) OnExit() {
-	c.logger.Println("OnExit")
 }
 func (c *Connected) handleLoginRequest(senderId uint64, message *packets.Packet_LoginRequest) {
 	if senderId != c.client.Id() {
@@ -73,7 +73,11 @@ func (c *Connected) handleLoginRequest(senderId uint64, message *packets.Packet_
 
 	c.logger.Printf("User %s logged in successfully", username)
 	c.client.SocketSend(packets.NewOkResponse())
-
+	c.client.SetState(&Ingame{
+		player: &objects.Player{
+			Name: username,
+		},
+	})
 }
 func (c *Connected) handleRegisterRequest(senderId uint64, message *packets.Packet_RegisterRequest) {
 	if senderId != c.client.Id() {

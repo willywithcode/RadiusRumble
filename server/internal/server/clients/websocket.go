@@ -22,7 +22,6 @@ type WebSocketClient struct {
 }
 
 func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *http.Request) (server.ClientInterface, error) {
-	log.Println("Creating new WebSocket client...")
 	upgrader := websocket.Upgrader{
 		ReadBufferSize:  1024,
 		WriteBufferSize: 1024,
@@ -36,8 +35,6 @@ func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *ht
 		log.Printf("Failed to upgrade connection: %v", err)
 		return nil, err
 	}
-	log.Println("WebSocket connection upgraded successfully")
-
 	var c = &WebSocketClient{
 		id:       uint64(hub.Clients.Len()),
 		conn:     conn,
@@ -46,7 +43,6 @@ func NewWebSocketClient(hub *server.Hub, writer http.ResponseWriter, request *ht
 		sendChan: make(chan *packets.Packet, 256),
 		dbTx:     hub.NewDbTx(),
 	}
-	log.Printf("Created new WebSocket client with temporary ID: %d", c.id)
 	return c, nil
 }
 
@@ -69,6 +65,10 @@ func (c *WebSocketClient) SocketSend(msg packets.Msg) {
 
 func (c *WebSocketClient) DbTx() *server.DbTx {
 	return c.dbTx
+}
+
+func (c *WebSocketClient) SharedGameObjects() *server.SharedGameObjects {
+	return c.hub.SharedGameObject
 }
 
 func (c *WebSocketClient) SetState(state server.ClientStateHandler) {
@@ -118,8 +118,6 @@ func (c *WebSocketClient) ReadPump() {
 		c.logger.Println("Closing read pump")
 		c.Close("Read pump closed")
 	}()
-
-	c.logger.Println("Starting read pump")
 	for {
 		_, data, err := c.conn.ReadMessage()
 		if err != nil {
@@ -128,7 +126,6 @@ func (c *WebSocketClient) ReadPump() {
 			}
 			break
 		}
-		c.logger.Printf("Received message: %d bytes", len(data))
 		packet := &packets.Packet{}
 		err = proto.Unmarshal(data, packet)
 		if err != nil {
@@ -147,10 +144,7 @@ func (c *WebSocketClient) WritePump() {
 		c.logger.Println("Closing write pump")
 		c.Close("Write pump closed")
 	}()
-
-	c.logger.Println("Starting write pump")
 	for packet := range c.sendChan {
-		c.logger.Printf("Sending packet to client")
 		writer, err := c.conn.NextWriter(websocket.BinaryMessage)
 		if err != nil {
 			c.logger.Printf("error: %v", err)
@@ -177,6 +171,12 @@ func (c *WebSocketClient) WritePump() {
 
 func (c *WebSocketClient) Close(reason string) {
 	c.logger.Printf("Client %d disconnected: %s", c.id, reason)
+
+	// Notify other players about this player leaving
+	if c.state != nil && c.state.Name() == "Ingame" {
+		c.Broadcast(packets.NewId(c.id)) // Use IdMessage to signal player disconnection
+	}
+
 	c.SetState(nil)
 	c.hub.UnregisterChan <- c
 	c.conn.Close()

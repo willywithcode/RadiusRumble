@@ -25,7 +25,20 @@ message ChatMessage {
 message IdMessage {
     uint64 id = 1;
 }
-// ...
+message PlayerMessage {
+    uint64 id = 1;
+    string name = 2;
+    double x = 3;
+    double y = 4;
+    double radius = 5;
+    double direction = 6;
+    double speed = 7;
+}
+
+message PlayerDirectionMessage {
+    double direction = 1;
+}
+
 message Packet {
     uint64 sender_id = 1;
     oneof msg {
@@ -35,6 +48,8 @@ message Packet {
         RegisterRequestMessage register_request = 5;
         OkResponseMessage ok_response = 6;
         DenyResponseMessage deny_response = 7;
+        PlayerMessage player = 8;
+        PlayerDirectionMessage player_direction = 9;
     }
 }
 
